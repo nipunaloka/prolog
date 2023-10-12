@@ -1,0 +1,178 @@
+%------------water jug-------------------
+
+% Define initial and goal states
+initial_state(0, 0).
+goal_state(2, _).
+
+% Define jug capacities
+jug_capacity(4, 3).
+
+% Filling a 4-liter jug
+fill(4, X, Y) :-
+    X < 4,
+    X1 is 4,
+    Y1 is Y,
+    write('Fill 4-liter jug: '), write('('), write(X1), write(','), write(Y1), writeln(')').
+
+% Filling a 3-liter jug
+fill(3, X, Y) :-
+    Y < 3,
+    X1 is X,
+    Y1 is 3,
+    write('Fill 3-liter jug: '), write('('), write(X1), write(','), write(Y1), writeln(')').
+
+% Emptying the 4-liter jug on the ground
+empty(4, X, Y) :-
+    X > 0,
+    X1 is 0,
+    Y1 is Y,
+    write('Empty 4-liter jug on the ground: '), write('('), write(X1), write(','), write(Y1), writeln(')').
+
+% Emptying the 3-liter jug on the ground
+empty(3, X, Y) :-
+    Y > 0,
+    X1 is X,
+    Y1 is 0,
+    write('Empty 3-liter jug on the ground: '), write('('), write(X1), write(','), write(Y1), writeln(')').
+
+% Pouring from 3 to 4
+pour(3, 4, X, Y) :-
+    X + Y >= 4, Y > 0,
+    X1 is 4,
+    Y1 is Y - (4 - X),
+    write('Pour from 3 to 4-liter jug: '), write('('), write(X1), write(','), write(Y1), writeln(')').
+
+% Pouring from 4 to 3
+pour(4, 3, X, Y) :-
+    X + Y >= 3, X > 0,
+    X1 is X - (3 - Y),
+    Y1 is 3,
+    write('Pour from 4 to 3-liter jug: '), write('('), write(X1), write(','), write(Y1), writeln(')').
+
+% Pouring all from 3 to 4
+pour_all(3, 4, X, Y) :-
+    X + Y =< 4, Y >= 0,
+    X1 is X + Y,
+    Y1 is 0,
+    write('Pour all from 3 to 4-liter jug: '), write('('), write(X1), write(','), write(Y1), writeln(')').
+
+% Pouring all from 4 to 3
+pour_all(4, 3, X, Y) :-
+    X + Y =< 3, X >= 0,
+    X1 is 0,
+    Y1 is X + Y,
+    write('Pour all from 4 to 3-liter jug: '), write('('), write(X1), write(','), write(Y1), writeln(')').
+
+% Solving the Water Jug Problem
+solve(X, Y) :-
+    initial_state(A, B),
+    goal_state(X, Y),
+    jug_capacity(Capacity4, Capacity3),
+    solve_helper(A, B, Capacity4, Capacity3, []).
+
+% Helper predicate for solving
+solve_helper(X, Y, _, Y, Operations) :-
+    goal_state(X, Y),
+    reverse(Operations, Reversed),
+    writeln('Solution:'),
+    print_operations(Reversed).
+
+solve_helper(X, Y, Capacity4, Capacity3, Operations) :-
+    fill(4, X, Y),
+    X1 is Capacity4,
+    solve_helper(X1, Y, Capacity4, Capacity3, [fill(4) | Operations]).
+
+solve_helper(X, Y, Capacity4, Capacity3, Operations) :-
+    fill(3, X, Y),
+    Y1 is Capacity3,
+    solve_helper(X, Y1, Capacity4, Capacity3, [fill(3) | Operations]).
+
+solve_helper(X, Y, Capacity4, Capacity3, Operations) :-
+    empty(4, X, Y),
+    X1 is 0,
+    solve_helper(X1, Y, Capacity4, Capacity3, [empty(4) | Operations]).
+
+solve_helper(X, Y, Capacity4, Capacity3, Operations) :-
+    empty(3, X, Y),
+    Y1 is 0,
+    solve_helper(X, Y1, Capacity4, Capacity3, [empty(3) | Operations]).
+
+solve_helper(X, Y, Capacity4, Capacity3, Operations) :-
+    pour(3, 4, X, Y),
+    X1 is Capacity4,
+    Y1 is Y - (Capacity4 - X),
+    solve_helper(X1, Y1, Capacity4, Capacity3, [pour(3, 4) | Operations]).
+
+solve_helper(X, Y, Capacity4, Capacity3, Operations) :-
+    pour(4, 3, X, Y),
+    X1 is X - (Capacity3 - Y),
+    Y1 is Capacity3,
+    solve_helper(X1, Y1, Capacity4, Capacity3, [pour(4, 3) | Operations]).
+
+solve_helper(X, Y, Capacity4, Capacity3, Operations) :-
+    pour_all(3, 4, X, Y),
+    X1 is X + Y,
+    Y1
+
+%---------------------------------------------------------------------------
+
+%---------------water_jug2--------------------------
+
+water_jug(X,Y):- X>4, Y<3, write("4L water jug over flowed"),nl.
+water_jug(X,Y):-X<4, Y>3, write("3L water jug over flowed"),nl.
+water_jug(X,Y):- X<4, Y<3, write("both are emty"),nl.
+
+write_jug(X, Y):-
+    (X=:= 0, Y=:=0, write('4L:4 & 3L:0, 3L is empty'),X is 4, water_jug(4,0));
+    (X=:= 0, Y=:=0, write('4L:0 & 3L:3, 4L is empty'),X is 3, water_jug(0,3));
+    (X=:= 2, Y=:=0, write('reach the goal'),X is 4, water_jug(4,0));
+
+    (X=:= 0, Y=:=3, write('4L:3 & 3L:0, 4L is now 3L'),X is 3, water_jug(3,0));
+    (X=:= 4, Y=:=0, write('4L:3 & 1L:3, 4L is now 1L'),X is 1, water_jug(1,3));
+
+    (X=:= 3, Y=:=3, write('4L:3 & 3L:0'),water_jug(4,2));
+    (X=:= 0, Y=:=2, write('4L:2 & 3L:0'),water_jug(2,0)).
+
+%--------------------------------------------------------------------------------------
+
+%-----------monkey banana--------------------
+move(state(middle,onbox,middle,hasnot),
+   grasp,
+   state(middle,onbox,middle,has)).
+move(state(P,onfloor,P,H),
+   climb,
+   state(P,onbox,P,H)).
+move(state(P1,onfloor,P1,H),
+   drag(P1,P2),
+   state(P2,onfloor,P2,H)).
+move(state(P1,onfloor,B,H),
+   walk(P1,P2),
+   state(P2,onfloor,B,H)).
+canget(state(_,_,_,has)).
+canget(State1) :-
+   move(State1,_,State2),
+   canget(State2).
+%------------------
+%canget(state(atdoor, onfloor, atwindow, hasnot)).
+%trace
+%canget(state(atdoor, onfloor, atwindow, hasnot)).
+
+
+%------------------------------------------------------------------------
+
+%--------------towers on hanoi------------------------------------
+
+move(1,X,Y,_):-
+    write('Move top disk from '),write(X), write('to'), write(Y),nl.
+
+move(N,X,Y,Z):-
+    N > 1,
+    M is N-1,
+    move(M,X,Z,Y),
+    move(1,X,Y,_),
+    move(M,Z,Y,X).
+
+%move(4,source,target,auxiliary).
+
+
+%----------------------------------------------------------------------------
